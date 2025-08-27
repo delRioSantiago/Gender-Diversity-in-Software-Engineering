@@ -205,3 +205,38 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- Project: Gender-Diversity ------------------------------------------------
+
+# Daten: alles ignorieren, nur wenige finale Artefakte versionieren
+data/**
+!data/.gitkeep
+!data/authors_with_gender.csv
+!data/edges.csv
+!data/preprocess_summary.json
+!data/firstnames_sample.csv
+
+# Rohquellen/DBLP-Downloads (falls außerhalb von data/ landen)
+dblp.xml
+dblp.xml.gz
+dblp.dtd
+
+# Ergebnisse der Gender-APIs (Rohantworten nicht ins Repo)
+results_*.csv
+
+# Ausgaben und Logs
+outputs/
+logs/
+*.log
+
+# Lokale Coupons/Keys/Secrets
+*.env.local
+*.secret
+*.secrets
+*.credentials
+*.token
+
+# Conda cache
+.conda/
+.condatmp/
+conda-meta/
