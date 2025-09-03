@@ -24,7 +24,7 @@ N_RANDOM = 100
 MF = {"male", "female"}
 
 
-# ---------------- Hilfsfunktionen ---------------- #
+# Hilfsfunktionen 
 
 def load_graph():
     nodes_df = pd.read_csv(AUTHORS_WITH_GENDER_CSV, dtype=str)[["author_id","gender"]]
@@ -58,7 +58,7 @@ def assortativity_known(Gx):
     return nx.attribute_assortativity_coefficient(Hk, "gender")
 
 
-# ---------------- Analyse-Module ---------------- #
+# Analysis modules
 
 def compute_global_metrics(G):
     """Globale und LCC-Kennzahlen"""
@@ -130,7 +130,7 @@ def removal_experiment(H, top_ids):
     rel_change = delta_r / r_before if r_before!=0 else np.nan
     print(f"Δr = {delta_r:.5f}, relative Änderung = {rel_change:.2%}")
 
-    # Random-Gruppen
+    # Random groups
     rng = np.random.default_rng(SEED)
     rand_rs = []
     for _ in range(N_RANDOM):
@@ -214,13 +214,13 @@ def community_analysis(H):
     import igraph as ig
     import leidenalg
 
-    # NetworkX -> iGraph Konvertierung
+    # NetworkX -> iGraph conversion
     mapping = {n: i for i, n in enumerate(H.nodes())}
     rev_mapping = {i: n for n, i in mapping.items()}
     edges = [(mapping[u], mapping[v]) for u, v in H.edges()]
     g = ig.Graph(edges=edges, directed=False)
     
-    # Gender-Attribut übernehmen
+    # Adopt gender attribute
     genders = [H.nodes[rev_mapping[i]].get("gender","unknown") for i in range(g.vcount())]
     g.vs["gender"] = genders
 
@@ -228,7 +228,7 @@ def community_analysis(H):
     partition = leidenalg.find_partition(g, leidenalg.RBConfigurationVertexPartition)
     labels = partition.membership
 
-    # Ergebnisse sammeln
+    # Collect results
     rows=[]
     for comm_id in set(labels):
         members=[rev_mapping[i] for i,l in enumerate(labels) if l==comm_id]
@@ -250,7 +250,7 @@ def community_analysis(H):
     df.to_csv(R_METRICS/"community_metrics.csv",index=False,float_format="%.6f")
     print("geschrieben:", R_METRICS/"community_metrics.csv")
 
-    # ---- Zusammenfassung über alle Communities ----
+    # Summary of all communities
     if not df.empty:
         summary = pd.DataFrame([{
             "n_communities": len(df),
@@ -290,7 +290,7 @@ def community_bridging(H, labels, top_ids):
     # Mapping Node -> Community
     mapping = {n: labels[i] for i, n in enumerate(H.nodes())}
     
-    # Frauenquote pro Community
+    # Percentage of women per community
     comm_stats = {}
     for comm_id in set(labels):
         members=[n for n,l in mapping.items() if l==comm_id]
@@ -299,7 +299,7 @@ def community_bridging(H, labels, top_ids):
         share_female = female/(male+female) if (male+female)>0 else np.nan
         comm_stats[comm_id]=share_female
     
-    # Detailtabelle: welche Communities werden verbunden?
+    # Detailed table: which communities are connected?
     rows=[]
     for n in top_ids:
         neigh=list(H.neighbors(n))
@@ -325,7 +325,7 @@ def community_bridging(H, labels, top_ids):
     else:
         print("Keine Brücken-Communitys gefunden")
     
-    # ---- Zusammenfassung über alle Bridging-Paare ----
+    # Summary of all bridging pairs
     if df.empty:
         summary=pd.DataFrame([{
             "n_bridging_nodes":0,"n_bridging_pairs":0,
@@ -345,9 +345,9 @@ def community_bridging(H, labels, top_ids):
     summary.to_csv(R_METRICS/"community_bridging_summary.csv",index=False,float_format="%.6f")
     print("geschrieben:", R_METRICS/"community_bridging_summary.csv")
 
-    # ---- Zusatz: nur "homogene" Communities betrachten ----
+    # Only consider "homogeneous" communities 
     if not df.empty:
-        # Homogen = Frauenanteil <0.3 oder >0.7 (anpassbar!)
+        # Homogeneous = proportion of women <0.3 or >0.7
         df_hom = df.dropna(subset=["share_female_c1","share_female_c2"]).copy()
         df_hom = df_hom[((df_hom["share_female_c1"]<0.3)|(df_hom["share_female_c1"]>0.7)) &
                         ((df_hom["share_female_c2"]<0.3)|(df_hom["share_female_c2"]>0.7))]
@@ -377,9 +377,6 @@ def community_bridging(H, labels, top_ids):
         }])
     return df, summary, summary_hom
 
-
-
-# ---------------- Main ---------------- #
 
 def main():
     G,_,_ = load_graph()

@@ -1,14 +1,14 @@
 import pandas as pd
 import re
 
-# ===== Pfade und Spaltennamen (Platzhalter anpassen) =====
-AUTHORS_CSV      = "./data/raw/authors_filtered.csv"    # Tabelle mit vollständigen Namen
-AUTH_ID_COL      = "author_id"               # Autoren-ID-Spalte in AUTHORS_CSV
-AUTH_NAME_COL    = "canonical_fullname"                    # Voller Name in AUTHORS_CSV, z.B. "Ada Lovelace"
-GENDER_MAP_CSV   = "./data/raw/results_io.csv"      # Tabelle mit 'firstname','gender'
-OUT_AUTHORS_CSV  = "./data/processed/authors_with_gender.csv" # Ausgabedatei
+# Column names
+AUTHORS_CSV      = "./data/raw/authors_filtered.csv"    # Table with full names
+AUTH_ID_COL      = "author_id"               # Author ID column in AUTHORS_CSV
+AUTH_NAME_COL    = "canonical_fullname"                    # Full name in AUTHORS_CSV, e.g. "Ada Lovelace"
+GENDER_MAP_CSV   = "./data/raw/results_io.csv"      # Table with 'firstname','gender'
+OUT_AUTHORS_CSV  = "./data/processed/authors_with_gender.csv" # Output file
 
-# ===== Hilfen =====
+# Hilfen
 MF = {"male","female"}
 
 def extract_firstname(fullname: str) -> str:
@@ -19,35 +19,35 @@ def extract_firstname(fullname: str) -> str:
     """
     if pd.isna(fullname):
         return ""
-    # führende/trailing Satzzeichen sanft kappen
+    # Cut leading/trailing punctuation marks
     s = str(fullname).strip()
-    # erster Token bis zum ersten Leerzeichen
+    # first token up to the first space
     token = s.split(" ", 1)[0]
-    # Randzeichen wie , ; : ( ) ' " . entfernen, Bindestrich behalten
+    # Remove marginal characters such as , ; : ( ) ' " . keep hyphen
     token = re.sub(r"^[,;:()'\"\.]+|[,;:()'\"\.]+$", "", token)
     return token
 
-# ===== Laden =====
+# Load
 authors = pd.read_csv(AUTHORS_CSV)
 gmap    = pd.read_csv(GENDER_MAP_CSV)
 
-# Grundchecks
+# Basic checks
 if AUTH_NAME_COL not in authors.columns:
     raise ValueError(f"In {AUTHORS_CSV} fehlt die Spalte '{AUTH_NAME_COL}'.")
 if "firstname" not in gmap.columns or "gender" not in gmap.columns:
     raise ValueError(f"In {GENDER_MAP_CSV} werden die Spalten 'firstname' und 'gender' erwartet.")
 
-# Vornamen extrahieren
+# Extract first names
 authors = authors.copy()
 authors["firstname"] = authors[AUTH_NAME_COL].apply(extract_firstname)
 
-# Merge auf exakt passenden Vornamen (keine Normalisierung)
+# Merge to exactly matching first names (no normalization)
 merged = authors.merge(gmap[["firstname","gender"]], on="firstname", how="left")
 
-# Unknown auffüllen
+# Fill up with Unknown
 merged["gender"] = merged["gender"].where(merged["gender"].isin(MF), other="unknown").fillna("unknown")
 
-# Ausgabe minimieren auf gewünschte Felder, aber die ID und der volle Name bleiben zur Rückverfolgbarkeit dabei
+# Minimize output to desired fields, but keep the ID and full name for traceability
 cols = [c for c in [AUTH_ID_COL, AUTH_NAME_COL, "firstname", "gender"] if c in merged.columns]
 merged[cols].to_csv(OUT_AUTHORS_CSV, index=False)
 

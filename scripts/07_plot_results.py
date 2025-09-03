@@ -25,7 +25,7 @@ def plot_ego_size_boxplot():
 def plot_ego_female_share_boxplot():
     top = pd.read_csv(RESULTS / "ego" / "ego_top.csv")
     ref = pd.read_csv(RESULTS / "ego" / "ego_ref.csv")
-    # nur bekannte Nachbar:innen bereits in female_share berücksichtigt
+    # Only known neighbors already included in female_share
     data = [ref["female_share"].dropna(), top["female_share"].dropna()]
     plt.figure()
     plt.boxplot(data, tick_labels=["ref", "top5"], showfliers=False)
@@ -54,14 +54,14 @@ def plot_removal_assortativity_with_table():
 
     fig, ax = plt.subplots()
     bars = ax.bar(range(3), vals, tick_label=labels)
-    # Fehlerbalken Random
+    # Random error bar
     yerr = np.array([[r_rand_mean - q025], [q975 - r_rand_mean]])
     ax.errorbar(2, r_rand_mean, yerr=yerr, fmt="none", capsize=5, color="black")
 
     ax.set_ylabel("Assortativität r")
     ax.set_title("Assortativität: Top-Removal vs. Random")
 
-    # Tabelle mit Kennzahlen einfügen
+    # Insert table with key figures
     cell_text = [[f"{r_before:.3f}", f"{r_after_top:.3f}", f"{delta_r:+.3f}", f"p={row['p_value']:.4f}"]]
     col_labels = ["r_before", "r_after_top", "Δr", "Permutation p"]
     table = plt.table(cellText=cell_text,
@@ -70,7 +70,7 @@ def plot_removal_assortativity_with_table():
                       cellLoc="center",
                       bbox=[0.0, -0.3, 1, 0.2])  # [left, bottom, width, height]
 
-    plt.subplots_adjust(bottom=0.25)  # Platz für Tabelle
+    plt.subplots_adjust(bottom=0.25)  # Space for table
     plt.tight_layout()
     plt.savefig(FIGDIR / "removal_assortativity_with_table.png", dpi=200)
     plt.close()

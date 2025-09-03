@@ -36,6 +36,8 @@ Speichere die Ergebnisse als:
 
 ./data/raw/results_com.csv
 
+Bei den gender-api.io Ergebnissen wurde die Zeile mit der Bezeichnung first_names gelöscht, da dort kein gültiger Name vorlag, und die Spalte Col 1 wurde manuell in first_name umbenannt.
+
 Danach geht es mit 03_gender_api.py weiter.
 
 # Pipline  
@@ -52,7 +54,10 @@ python 02_preprocess_authors.py --data-dir ./data/raw
 python 03_gender_api.py
 
 ### Schritt 4: Gender in Autorenliste einfügen
+Derzeit werden nur die Ergebnisse von genderapi.io verwendet. Sollten die Ergebnisse beider Dienste zur Verfügung stehen muss hier noch der Pfad entsprechend angepasst werden
 python 04_merge_gender.py
+
+
 
 ### Schritt 5: Graph aufbauen
 python 05_graph_build.py

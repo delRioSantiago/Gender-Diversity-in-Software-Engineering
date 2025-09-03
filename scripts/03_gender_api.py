@@ -1,6 +1,6 @@
 import pandas as pd
 
-# Pfade
+# Paths
 FILE_IO  = "./data/raw/results_io.csv"   
 FILE_COM = "./data/raw/results_com.csv"  
 OUT_CSV  = "./data/raw/merged_genders.csv"
@@ -11,19 +11,19 @@ IO_COL_FIRSTNAME  = "first_name"
 IO_COL_GENDER     = "gender"
 IO_COL_PROB       = "probability"   
 
-# gernder-api.com-Datei
+# gender-api.com-Datei
 COM_COL_FIRSTNAME = "first_name"
 COM_COL_GENDER    = "ga_gender"
 COM_COL_ACCURACY  = "ga_accuracy"   
 COM_COL_SAMPLES   = "ga_samples"    
 
-# Parameter 
-THRESHOLD   = 0.40   # Schwellenwert für Sicherheit bei der Geschlechtsbestimmung
-MIN_SAMPLES = 5      # Mindeststichprobe für genderapi.io-Datei
+# Parameters 
+THRESHOLD   = 0.60   # Threshold value for safety in sex determination
+MIN_SAMPLES = 5      # Minimum sample for genderapi.io file
 
 MF = {"male", "female"}
 
-def to_unit(p_series): #
+def to_unit(p_series):
     p = pd.to_numeric(p_series, errors="coerce")
     return (p / 100.0).fillna(0.0)
 

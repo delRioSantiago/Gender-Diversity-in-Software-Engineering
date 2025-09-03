@@ -2,9 +2,7 @@
 import os, gzip, csv, uuid, html, shutil
 from lxml import etree
 
-# ---------------------------
 # Paths & Outputs
-# ---------------------------
 DATA_DIR = os.environ.get("DBLP_DATA_DIR", "./data/raw")  
 GZ_FILE = os.path.join(DATA_DIR, "dblp.xml.gz")
 XML_FILE = os.path.join(DATA_DIR, "dblp.xml")
@@ -19,9 +17,7 @@ PAPERS       = os.path.join(DATA_DIR, "papers.csv")
 AUTHORS      = os.path.join(DATA_DIR, "authors.csv")
 AUTHORSHIP   = os.path.join(DATA_DIR, "authorship.csv")
 
-# ---------------------------
 # Config
-# ---------------------------
 START_YEAR = int(os.environ.get("DBLP_START_YEAR", "2015"))
 END_YEAR   = int(os.environ.get("DBLP_END_YEAR",   "2024"))
 
@@ -31,9 +27,7 @@ VENUE_NAMES = {
     "fse":  ["fse", "foundations of software engineering", "esec/fse"]
 }
 
-# ---------------------------
 # Helpers
-# ---------------------------
 def ensure_dir(p):
     os.makedirs(p, exist_ok=True)
 
@@ -115,9 +109,8 @@ def normalize_homepage_id(hp_key: str) -> str:
     if hp_key.startswith("homepages/"): return hp_key[len("homepages/"):]
     return hp_key
 
-# ---------------------------
+
 # Phase 1: Stream parse & write PAPERS + temp ALIAS_PAPER/HOMEPAGES_MAP
-# ---------------------------
 def stream_build(xml_path: str):
     ensure_dir(TMP_DIR)
     # final papers.csv directly
@@ -171,9 +164,8 @@ def stream_build(xml_path: str):
             clear_elem(elem)
         del ctx
 
-# ---------------------------
+
 # Phase 2: Build AUTHORS + AUTHORSHIP, scoped to aliases in papers
-# ---------------------------
 def materialize_final_from_temp():
     print("Materializing authors/authorship from temp...")
 
@@ -238,9 +230,7 @@ def _count_lines(p):
     except Exception:
         return -1
 
-# ---------------------------
 # Main
-# ---------------------------
 def main():
     ensure_unzipped()
     stream_build(XML_FILE)

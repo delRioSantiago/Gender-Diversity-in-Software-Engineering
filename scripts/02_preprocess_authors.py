@@ -1,36 +1,3 @@
-
-"""
-03_preprocess_authors.py
-
-Preprocess authors & authorship for co-authorship networks.
-
-Inputs (from fetch step):
-- authors.csv        (author_id, canonical_fullname)
-- authorship.csv     (paper_id, author_id)
-- papers.csv         (paper_id, doi, title, year, conference_key)   [optional]
-
-Outputs:
-- authors_filtered.csv
-- authorship_filtered.csv
-- papers_filtered.csv              (only if papers.csv exists)
-- preprocess_summary.json          (counts & drop reasons incl. single-author drops)
-
-Filtering (as discussed):
-- Drop names with only one token (mononyms).
-- Drop names where the *second character* in the full string is '.' or ' ' (simple initial heuristic).
-- Digits in names are allowed.
-- No organization filter.
-
-Then:
-- Restrict authorship to remaining authors.
-- Drop papers with exactly one remaining author (count how many).
-- Count authors who appear only on such single-author papers (and thus drop out).
-- Optionally drop isolates (default: drop).
-
-Usage:
-  python 03_preprocess_authors.py --data-dir ./data [--keep-isolates]
-"""
-
 import os, csv, json, argparse, pandas as pd
 
 from collections import defaultdict
